@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HelpConnect - Find Local Service Providers</title>
+  <meta name="color-scheme" content="light dark"/>
+  <style>
+    /* ========== THEME TOKENS ========== */
+    :root {
+      color-scheme: light dark;
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary: #8b5cf6;
+      --accent: #ec4899;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-card: #ffffff;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: rgba(0,0,0,.12);
+      --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      --ring: #ffae00;
+
+      --radius-2: 8px;
+      --radius-3: 12px;
+      --radius-pill: 999px;
+
+      --space-1: .25rem;
+      --space-2: .5rem;
+      --space-3: .75rem;
+      --space-4: 1rem;
+      --space-6: 1.5rem;
+      --space-8: 2rem;
+      --space-12: 3rem;
+
+      --fs-300: clamp(.9rem, .4vw + .8rem, 1rem);
+      --fs-400: clamp(1rem, .6vw + .9rem, 1.125rem);
+      --fs-500: clamp(1.125rem, 1vw + .9rem, 1.25rem);
+      --fs-600: clamp(1.25rem, 1.2vw + 1rem, 1.5rem);
+      --fs-700: clamp(1.5rem, 2vw + 1rem, 2rem);
+      --fs-800: clamp(1.875rem, 3vw + 1rem, 2.5rem);
+    }
+
+    [data-theme="dark"] {
+      --primary: #818cf8;
+      --primary-dark: #6366f1;
+      --secondary: #a78bfa;
+      --accent: #f472b6;
+      --success: #34d399;
+      --bg-primary: #0f172a;
+      --bg-secondary: #111827;
+      --bg-card: #1e293b;
+      --text-primary: #e5e7eb;
+      --text-secondary: #cbd5e1;
+      --text-muted: #9ca3af;
+      --border: #293142;
+      --shadow: rgba(0,0,0,.35);
+      --ring: #ffd166;
+    }
+
+    [data-theme="high-contrast"] {
+      --primary: #0000ff;
+      --primary-dark: #0000cc;
+      --secondary: #6600cc;
+      --accent: #ff0066;
+      --success: #00ff00;
+      --bg-primary: #000000;
+      --bg-secondary: #0a0a0a;
+      --bg-card: #0a0a0a;
+      --text-primary: #ffffff;
+      --text-secondary: #ffffff;
+      --text-muted: #cccccc;
+      --border: #ffffff;
+      --shadow: rgba(255,255,255,.2);
+      --ring: #ffff00;
+    }
+
+    /* ========== BASE ========== */
+    * { box-sizing: border-box; }
+    html:focus-within { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      accent-color: var(--primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .container { max-width: 1200px; margin-inline: auto; padding-inline: 1rem; }
+    .stack > * + * { margin-block-start: var(--space-6); }
+
+    a { color: var(--primary); text-decoration: none; transition: all 0.3s ease; }
+    a:hover { text-decoration: underline; }
+
+    :focus-visible {
+      outline: 3px solid var(--ring);
+      outline-offset: 2px;
+      box-shadow: 0 0 0 6px color-mix(in oklab, var(--ring), transparent 70%);
+    }
+
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    @keyframes float { 
+      from { transform: translateY(0); } 
+      to { transform: translateY(-120px); } 
+    }
+
+    /* ========== NAV ========== */
+    nav {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 2px 20px var(--shadow);
+      backdrop-filter: saturate(120%) blur(10px);
+      animation: fadeIn 0.5s ease;
+    }
+    .nav-container {
+      max-width: 1200px; margin: 0 auto; padding: .9rem 1rem;
+      display: flex; align-items: center; gap: 1rem; justify-content: space-between;
+    }
+    .logo {
+      font-weight: 800; font-size: 1.5rem; background: var(--gradient);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .logo:hover { transform: scale(1.05); }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; align-items: center; }
+    .nav-links a { 
+      color: var(--text-secondary); 
+      padding: .4rem .6rem; 
+      position: relative;
+      font-weight: 500;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s ease, left 0.3s ease;
+    }
+    .nav-links a:hover::after,
+    .nav-links a[aria-current="page"]::after {
+      width: 100%;
+      left: 0;
+    }
+    .nav-links a[aria-current="page"] { 
+      font-weight: 700; 
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .theme-switcher { display: flex; gap: .5rem; align-items: center; }
+    .theme-btn {
+      background: var(--bg-secondary); border: 2px solid var(--border); color: var(--text-primary);
+      padding: .4rem .7rem; border-radius: var(--radius-2); cursor: pointer; font-size: .9rem; font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .theme-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+    .theme-btn.active { 
+      background: var(--primary); 
+      color: #fff; 
+      border-color: var(--primary);
+      box-shadow: 0 4px 16px rgba(99, 102, 241, 0.3);
+    }
+    .mobile-toggle { 
+      display: none; 
+      background: none; 
+      border: 0; 
+      font-size: 1.5rem; 
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .mobile-toggle:hover { transform: scale(1.1); }
+
+    @media (max-width: 880px) {
+      .nav-links {
+        position: absolute; left: 0; right: 0; top: 100%; background: var(--bg-card);
+        border-bottom: 1px solid var(--border); display: none; flex-direction: column; padding: 1rem;
+        animation: slideInRight 0.3s ease;
+      }
+      .nav-links.open { display: flex; }
+      .mobile-toggle { display: inline-flex; }
+    }
+
+    /* ========== HERO ========== */
+    .hero {
+      background: var(--gradient); color: #fff; padding: var(--space-12) 1rem var(--space-8);
+      position: relative; overflow: hidden; text-align: center;
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160"><circle cx="80" cy="80" r="2" fill="white" opacity="0.12"/></svg>');
+      animation: float 20s linear infinite;
+    }
+    .hero-content { 
+      position: relative; 
+      z-index: 1; 
+      max-width: 800px; 
+      margin: 0 auto;
+      animation: fadeIn 0.8s ease;
+    }
+    .hero h1 { 
+      font-size: var(--fs-800); 
+      margin: 0 0 1rem;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    }
+    .hero p { 
+      font-size: var(--fs-500); 
+      opacity: .95; 
+      margin: 0 0 1.5rem;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.1);
+    }
+    .cta-buttons { 
+      display: flex; 
+      gap: .75rem; 
+      justify-content: center; 
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block; 
+      padding: .9rem 1.5rem; 
+      border-radius: var(--radius-pill);
+      font-weight: 700; 
+      border: 2px solid transparent; 
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease, height 0.6s ease;
+    }
+    .btn:hover::before { width: 300px; height: 300px; }
+    .btn-primary { background: #fff; color: var(--primary); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(0,0,0,0.3); }
+    .btn-secondary { background: transparent; color: #fff; border-color: #fff; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+
+    /* ========== SECTIONS ========== */
+    main { min-height: 60vh; }
+    .section-header { text-align: center; margin-block: var(--space-8) var(--space-6); animation: fadeIn 0.8s ease; }
+    .section-header h2 {
+      font-size: var(--fs-700); margin: 0 0 .5rem; background: var(--gradient);
+      -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .section-header p { color: var(--text-secondary); margin: 0; }
+
+    /* ========== GRIDS ========== */
+    .grid { display: grid; gap: var(--space-4); }
+    .services-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); animation: fadeIn 0.8s ease 0.2s backwards; }
+    .providers-grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); animation: fadeIn 0.8s ease 0.2s backwards; }
+
+    /* ========== CARDS ========== */
+    .card {
+      background: var(--bg-card); border: 1.5px solid var(--border);
+      border-radius: var(--radius-3); box-shadow: 0 6px 24px var(--shadow);
+      transition: all 0.3s ease;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px var(--shadow); }
+    .service-card { padding: 1.6rem; text-align: center; position: relative; overflow: hidden; cursor: pointer; transition: all 0.3s ease; }
+    .service-card::before {
+      content: ""; position: absolute; inset: 0 -120% 0 0; 
+      background: linear-gradient(90deg, transparent, rgba(99,102,241,.12), transparent);
+      transform: translateX(-100%); opacity: 0; pointer-events: none;
+    }
+    .service-card:where(:hover,:focus-visible) { border-color: var(--primary); transform: translateY(-8px); box-shadow: 0 16px 48px var(--shadow); }
+    .service-card:where(:hover,:focus-visible)::before { transition: transform .55s ease, opacity .55s ease; transform: translateX(100%); opacity: 1; }
+    .service-icon { font-size: 2.5rem; margin-bottom: 0.5rem; display: inline-block; transition: transform 0.3s ease; }
+    .service-card:hover .service-icon { transform: scale(1.15) rotate(5deg); }
+    .service-card h3 { margin: 0.5rem 0; font-size: 1.3rem; }
+
+    .provider-card { overflow: hidden; display: grid; grid-template-rows: auto 1fr; }
+    .provider-header { background: var(--gradient); color: #fff; padding: 1.5rem; text-align: center; }
+    .avatar {
+      width: 90px; height: 90px; border-radius: 50%; background: #fff; margin: 0 auto .6rem;
+      display: grid; place-items: center; font-size: 1.8rem; border: 4px solid rgba(255,255,255,.35);
+      transition: transform 0.3s ease;
+    }
+    .provider-card:hover .avatar { transform: scale(1.05); }
+    .provider-body { padding: 1rem 1.2rem 1.2rem; }
+    .provider-skills { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0 .9rem; }
+    .skill-tag { background: var(--bg-secondary); color: var(--primary); padding: .3rem .7rem; border-radius: 20px; font-size: .85rem; font-weight: 600; transition: all 0.3s ease; }
+    .skill-tag:hover { background: var(--primary); color: white; transform: scale(1.05); }
+    .provider-info { display: grid; gap: .5rem; color: var(--text-secondary); font-size: .95rem; margin-bottom: .8rem; }
+    .provider-actions { display: flex; gap: .6rem; }
+    .chip { display: inline-block; padding: .4rem .8rem; border-radius: 999px; background: var(--bg-secondary); font-size: .85rem; color: var(--text-secondary); font-weight: 600; border: 1px solid var(--border); }
+
+    /* ========== FORMS ========== */
+    form { display: grid; gap: 1rem; animation: fadeIn 0.6s ease; }
+    label { font-weight: 700; display: block; margin-bottom: 0.3rem; }
+    input, select, textarea {
+      width: 100%; padding: .9rem 1rem; border-radius: var(--radius-2); border: 1.5px solid var(--border);
+      background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; font-family: inherit; transition: all 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); background: var(--bg-card); }
+    input[type="file"] { padding: 0.7rem; }
+    .row { display: grid; gap: .8rem; grid-template-columns: repeat(2, 1fr); }
+    .actions { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: .5ch;
+      padding: .9rem 1.3rem; border-radius: var(--radius-pill); border: 2px solid var(--primary);
+      background: var(--primary); color: #fff; font-weight: 700; cursor: pointer; transition: all 0.3s ease; font-size: 1rem;
+    }
+    .button:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4); }
+    .button.secondary { background: transparent; color: var(--primary); }
+    .button.secondary:hover { background: var(--bg-secondary); }
+    .button.success { background: var(--success); border-color: var(--success); }
+    .button.success:hover { background: #059669; }
+    .note { color: var(--text-muted); font-size: .9rem; }
+
+    /* ========== MODAL ========== */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 2000; align-items: center; justify-content: center; animation: fadeIn 0.3s ease; }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--bg-card); border-radius: var(--radius-3); padding: 2rem; max-width: 560px; width: 92%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3); animation: slideInRight 0.4s ease; position: relative;
+    }
+    .modal-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+    .modal-icon { font-size: 3rem; animation: pulse 2s ease infinite; }
+    .modal-close {
+      position: absolute; top: 1rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); transition: all 0.3s ease;
+    }
+    .modal-close:hover { color: var(--text-primary); transform: scale(1.2); }
+
+    /* ========== TOAST ========== */
+    .toast {
+      position: fixed; bottom: 2rem; right: 2rem; background: var(--bg-card); border: 2px solid var(--border);
+      border-radius: var(--radius-2); padding: 1rem 1.5rem; box-shadow: 0 8px 32px var(--shadow); display: flex; align-items: center; gap: 1rem; z-index: 3000; animation: slideInRight 0.4s ease; max-width: 420px;
+    }
+    .toast.success { border-color: var(--success); }
+    .toast-icon { font-size: 1.5rem; }
+
+    /* ========== PAGES (SPA) ========== */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ========== FOOTER ========== */
+    footer { background: var(--bg-secondary); border-top: 1px solid var(--border); margin-top: var(--space-8); padding: var(--space-8) 1rem; color: var(--text-secondary); }
+    .footer-grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .footer-grid h3 { margin-bottom: 0.8rem; color: var(--text-primary); }
+    .footer-grid a { display: block; margin-bottom: 0.5rem; transition: transform 0.3s ease; }
+    .footer-grid a:hover { transform: translateX(5px); }
+
+    /* ========== STATS SECTION ========== */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin: 3rem 0; }
+    .stat-card { text-align: center; padding: 1.5rem; background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius-3); transition: all 0.3s ease; }
+    .stat-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 8px 32px var(--shadow); }
+    .stat-number { font-size: 2.5rem; font-weight: 800; background: var(--gradient); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+    .stat-label { color: var(--text-secondary); margin-top: 0.5rem; }
+
+    /* ========== CONTROLS ========== */
+    .toolbar { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .toolbar .filters { display: flex; gap: .6rem; flex-wrap: wrap; }
+    .pill { padding: .5rem .8rem; border: 1.5px solid var(--border); border-radius: 999px; background: var(--bg-secondary); color: var(--text-secondary); cursor: pointer; transition: .2s; }
+    .pill.active { border-color: var(--primary); color: var(--primary); background: color-mix(in oklab, var(--primary) 12%, transparent); }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 720px) {
+      .row { grid-template-columns: 1fr; }
+      .cta-buttons { flex-direction: column; }
+      .btn { width: 100%; }
+      .toast { bottom: 1rem; right: 1rem; left: 1rem; max-width: none; }
+    }
+
+    /* ========== REDUCED MOTION ========== */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+    }
+
+    /* ========== LOADING STATE ========== */
+    .loading { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <a href="#main" class="button secondary" style="position:absolute;left:-9999px;top:auto;">Skip to content</a>
+
+  <nav role="navigation" aria-label="Main">
+    <div class="nav-container">
+      <div class="logo" onclick="location.hash='#home'">🤝 HelpConnect</div>
+      <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation" aria-expanded="false">☰</button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home" data-route="home">🏠 Home</a></li>
+        <li><a href="#services" data-route="services">🔍 Browse Services</a></li>
+        <li><a href="#providers" data-route="providers">👥 Find Providers</a></li>
+        <li><a href="#help" data-route="help">🆘 Need Help</a></li>
+        <li><a href="#register" data-route="register">⭐ Join as Provider</a></li>
+        <li><a href="#about" data-route="about">ℹ️ About</a></li>
+      </ul>
+      <div class="theme-switcher" role="group" aria-label="Theme">
+        <button class="theme-btn active" data-theme="light" aria-label="Light theme" title="Light">☀️</button>
+        <button class="theme-btn" data-theme="dark" aria-label="Dark theme" title="Dark">🌙</button>
+        <button class="theme-btn" data-theme="high-contrast" aria-label="High contrast theme" title="High Contrast">🎨</button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="main" class="stack" tabindex="-1" aria-live="polite" aria-atomic="true">
+    <!-- Home -->
+    <section id="page-home" class="page active" role="region" aria-labelledby="home-title">
+      <div class="hero">
+        <div class="hero-content">
+          <h1 id="home-title">🌟 Find Trusted Local Service Providers</h1>
+          <p>Discover skilled professionals and request help in minutes</p>
+          <div class="cta-buttons">
+            <a href="#services" class="btn btn-primary" data-route="services">Browse Services</a>
+            <a href="#providers" class="btn btn-secondary" data-route="providers">View All Providers</a>
+            <a href="#help" class="btn btn-primary" data-route="help">📝 Book a Provider</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="stats" id="stats">
+          <div class="stat-card">
+            <div class="stat-number" id="stat-providers">32</div>
+            <div class="stat-label">Active Providers</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat-categories">16</div>
+            <div class="stat-label">Service Categories</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">4.7</div>
+            <div class="stat-label">Average Rating</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">Support Available</div>
+          </div>
+        </div>
+
+        <header class="section-header">
+          <h2>Popular Services</h2>
+          <p>Explore top categories available right now</p>
+        </header>
+        <div class="grid services-grid" id="homeCategories"></div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section id="page-services" class="page" role="region" aria-labelledby="services-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="services-title">All Service Categories</h2>
+          <p>Select a category to see providers or request help</p>
+        </header>
+
+        <div class="toolbar">
+          <div class="filters" id="servicePills"></div>
+          <div>
+            <button class="button secondary" id="toRegisterFromServices">🤝 Want to join as a provider/helper?</button>
+          </div>
+        </div>
+
+        <div class="grid services-grid" id="servicesGrid"></div>
+      </div>
+    </section>
+
+    <!-- Providers -->
+    <section id="page-providers" class="page" role="region" aria-labelledby="providers-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="providers-title">Find Providers</h2>
+          <p>Search, filter, sort, and book instantly</p>
+        </header>
+
+        <div class="toolbar">
+          <div class="filters">
+            <input id="provSearch" type="search" placeholder="Search by name, skill, or service 🔎" aria-label="Search providers"/>
+            <select id="provCategory" aria-label="Filter by category">
+              <option value="">All Categories</option>
+            </select>
+            <select id="provLocation" aria-label="Filter by location">
+              <option value="">All Locations</option>
+            </select>
+            <select id="provSort" aria-label="Sort providers">
+              <option value="rating_desc">Sort: Rating ⬇️</option>
+              <option value="price_asc">Sort: Price ⬆️</option>
+              <option value="price_desc">Sort: Price ⬇️</option>
+              <option value="exp_desc">Sort: Experience ⬇️</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button class="button secondary" id="resetProv">Reset</button>
+            <button class="button" id="quickBook">⚡ Quick Book</button>
+          </div>
+        </div>
+
+        <div class="grid providers-grid" id="providersGrid"></div>
+      </div>
+    </section>
+
+    <!-- Need Help / Book a Provider -->
+    <section id="page-help" class="page" role="region" aria-labelledby="help-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="help-title">Book a Provider</h2>
+          <p>Share details and a coordinator will connect shortly</p>
+        </header>
+
+        <form id="helpForm" novalidate>
+          <div class="row">
+            <div>
+              <label for="helpName">Full Name</label>
+              <input id="helpName" name="name" type="text" required placeholder="e.g., Aarav Sharma"/>
+            </div>
+            <div>
+              <label for="helpPhone">Phone</label>
+              <input id="helpPhone" name="phone" type="tel" required pattern="[0-9]{10}" inputmode="numeric" placeholder="10-digit number"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="helpEmail">Email</label>
+              <input id="helpEmail" name="email" type="email" required placeholder="name@example.com"/>
+            </div>
+            <div>
+              <label for="helpService">Service Needed</label>
+              <select id="helpService" name="service" required></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="helpDate">Preferred Date</label>
+              <input id="helpDate" name="date" type="date" required/>
+            </div>
+            <div>
+              <label for="helpTime">Preferred Time</label>
+              <input id="helpTime" name="time" type="time" required/>
+            </div>
+          </div>
+
+          <div>
+            <label for="helpAddress">Address</label>
+            <textarea id="helpAddress" name="address" rows="3" required placeholder="Flat/House, Street, Area, City"></textarea>
+          </div>
+
+          <div>
+            <label for="helpNotes">Notes (optional)</label>
+            <textarea id="helpNotes" name="notes" rows="3" placeholder="Any special instructions"></textarea>
+          </div>
+
+          <div class="actions">
+            <button class="button" type="submit">📩 Submit Request</button>
+            <span class="note">Submitting confirms consent to be contacted 📞</span>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Join as Provider -->
+    <section id="page-register" class="page" role="region" aria-labelledby="register-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="register-title">Join as Provider</h2>
+          <p>Register to offer services on HelpConnect</p>
+        </header>
+
+        <form id="registerForm" novalidate>
+          <div class="row">
+            <div>
+              <label for="regName">Full Name</label>
+              <input id="regName" name="name" type="text" required placeholder="e.g., Priya Verma"/>
+            </div>
+            <div>
+              <label for="regPhone">Phone</label>
+              <input id="regPhone" name="phone" type="tel" required pattern="[0-9]{10}" inputmode="numeric" placeholder="10-digit number"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="regEmail">Email</label>
+              <input id="regEmail" name="email" type="email" required placeholder="name@example.com"/>
+            </div>
+            <div>
+              <label for="regCategory">Primary Service</label>
+              <select id="regCategory" name="category" required></select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="regLocation">Operating Location</label>
+              <input id="regLocation" name="location" type="text" required placeholder="e.g., Indirapuram, Ghaziabad"/>
+            </div>
+            <div>
+              <label for="regExperience">Experience (years)</label>
+              <input id="regExperience" name="experience" type="number" min="0" max="40" required placeholder="e.g., 3"/>
+            </div>
+          </div>
+
+          <div>
+            <label for="regSkills">Skills</label>
+            <input id="regSkills" name="skills" type="text" required placeholder="Comma-separated skills e.g., wiring, MCB, sockets"/>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="regAadhaar">Attach Aadhaar Card</label>
+              <input id="regAadhaar" name="aadhaar" type="file" accept=".pdf,.jpg,.jpeg,.png" required/>
+              <span class="note">Accepted: PDF/JPG/PNG. Ensure clear details 🔐</span>
+            </div>
+            <div>
+              <label for="regBankName">Bank Name</label>
+              <input id="regBankName" name="bankName" type="text" required placeholder="e.g., SBI"/>
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="regAccount">Account Number</label>
+              <input id="regAccount" name="account" type="text" required inputmode="numeric" pattern="[0-9]{9,18}" placeholder="9-18 digits"/>
+            </div>
+            <div>
+              <label for="regIFSC">IFSC Code</label>
+              <input id="regIFSC" name="ifsc" type="text" required pattern="[A-Z]{4}0[A-Z0-9]{6}" placeholder="e.g., SBIN0123456"/>
+            </div>
+          </div>
+
+          <div>
+            <label for="regUPI">UPI ID (optional)</label>
+            <input id="regUPI" name="upi" type="text" placeholder="e.g., name@bank"/>
+          </div>
+
+          <div class="actions">
+            <button class="button success" type="submit">✅ Submit Application</button>
+            <button class="button secondary" type="reset">Reset</button>
+            <span class="note">Data is encrypted-in-transit in modern browsers. Do not share OTP/PIN.</span>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- About -->
+    <section id="page-about" class="page" role="region" aria-labelledby="about-title">
+      <div class="container">
+        <header class="section-header">
+          <h2 id="about-title">About HelpConnect</h2>
+          <p>Connecting residents with trusted, verified local professionals</p>
+        </header>
+        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+          <div class="card" style="padding:1.2rem;">
+            <h3>🔒 Safety First</h3>
+            <p>Profiles include experience, skills, and rating to make informed choices.</p>
+          </div>
+          <div class="card" style="padding:1.2rem;">
+            <h3>⚡ Quick Booking</h3>
+            <p>Send a request in under a minute and receive confirmation promptly.</p>
+          </div>
+          <div class="card" style="padding:1.2rem;">
+            <h3>🎯 Local Focus</h3>
+            <p>Coverage spans Ghaziabad, Noida, and Delhi NCR for rapid assistance.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Booking Modal -->
+  <div class="modal" id="bookingModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="bookingTitle">
+    <div class="modal-content">
+      <button class="modal-close" aria-label="Close" id="bookingClose">✖</button>
+      <div class="modal-header">
+        <div class="modal-icon">📅</div>
+        <h3 id="bookingTitle">Book Provider</h3>
+      </div>
+      <form id="bookingForm" novalidate>
+        <input type="hidden" id="bookingProviderId"/>
+        <div class="row">
+          <div>
+            <label for="bookingProvider">Provider</label>
+            <input id="bookingProvider" type="text" readonly/>
+          </div>
+          <div>
+            <label for="bookingService">Service</label>
+            <input id="bookingService" type="text" readonly/>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="bookingName">Full Name</label>
+            <input id="bookingName" type="text" required placeholder="e.g., Riya Gupta"/>
+          </div>
+          <div>
+            <label for="bookingPhone">Phone</label>
+            <input id="bookingPhone" type="tel" required pattern="[0-9]{10}" inputmode="numeric" placeholder="10-digit number"/>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="bookingDate">Preferred Date</label>
+            <input id="bookingDate" type="date" required/>
+          </div>
+          <div>
+            <label for="bookingTime">Preferred Time</label>
+            <input id="bookingTime" type="time" required/>
+          </div>
+        </div>
+        <div>
+          <label for="bookingAddress">Address</label>
+          <textarea id="bookingAddress" rows="3" required placeholder="Flat/House, Street, Area, City"></textarea>
+        </div>
+        <div class="actions">
+          <button class="button" type="submit">📨 Confirm Booking</button>
+          <button class="button secondary" type="button" id="bookingCancel">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastRoot" aria-live="polite" aria-atomic="true"></div>
+
+  <footer>
+    <div class="container footer-grid">
+      <div>
+        <h3>🤝 HelpConnect</h3>
+        <p>Trusted services for every home and office.</p>
+      </div>
+      <div>
+        <h3>Explore</h3>
+        <a href="#services" data-route="services">Services</a>
+        <a href="#providers" data-route="providers">Providers</a>
+        <a href="#help" data-route="help">Need Help</a>
+        <a href="#register" data-route="register">Join as Provider</a>
+      </div>
+      <div>
+        <h3>Support</h3>
+        <a href="#help" data-route="help">Book a Provider</a>
+        <a href="#about" data-route="about">About</a>
+      </div>
+      <div>
+        <h3>Contact</h3>
+        <p>📧 support@helpconnect.local</p>
+        <p>📞 +91-98765-43210</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ========= Data =========
+    const categories = [
+      { id: 'electrician', name: 'Electrician', icon: '💡', desc: 'Wiring, MCB, sockets' },
+      { id: 'plumber', name: 'Plumber', icon: '🚰', desc: 'Leak fix, taps, pipes' },
+      { id: 'carpenter', name: 'Carpenter', icon: '🪵', desc: 'Furniture, fittings' },
+      { id: 'appliance', name: 'Appliance Repair', icon: '🧊', desc: 'AC, fridge, washing' },
+      { id: 'painter', name: 'Painter', icon: '🎨', desc: 'Interior & exterior' },
+      { id: 'cleaning', name: 'House Cleaning', icon: '🧽', desc: 'Deep clean, bathroom, kitchen' },
+      { id: 'tutor', name: 'Home Tutor', icon: '📚', desc: 'Math, Science, Languages' },
+      { id: 'it', name: 'IT Support', icon: '🖥️', desc: 'Setup, repair, network' },
+      { id: 'caregiver', name: 'Caregiver', icon: '🤗', desc: 'Elderly care, child care' },
+      { id: 'chef', name: 'Home Chef', icon: '👨‍🍳', desc: 'Cooking, meal prep' },
+      { id: 'security', name: 'Security Guard', icon: '🛡️', desc: 'Night watch, protection' },
+      { id: 'driver', name: 'Driver', icon: '🚗', desc: 'Personal, family driver' },
+      { id: 'gardener', name: 'Gardener', icon: '🌱', desc: 'Landscaping, plant care' },
+      { id: 'pest', name: 'Pest Control', icon: '🐜', desc: 'Cockroach, termite, rats' },
+      { id: 'massage', name: 'Massage Therapist', icon: '💆', desc: 'Spa, therapeutic massage' },
+      { id: 'beauty', name: 'Beauty Services', icon: '💅', desc: 'Salon at home, grooming' }
+    ];
+
+    const providers = [
+      // Original providers
+      { id: 1, name: 'Amit Kumar', emoji: '👷', category: 'electrician', location: 'Indirapuram, Ghaziabad', price: 299, exp: 5, rating: 4.8, jobs: 420, skills: ['Wiring','MCB','Fan','Light'], phone:'tel:+919876543210' },
+      { id: 2, name: 'Priya Verma', emoji: '🧰', category: 'plumber', location: 'Noida Sector 62', price: 249, exp: 4, rating: 4.6, jobs: 310, skills: ['Taps','Leakage','Sink','Pipes'], phone:'tel:+919123456789' },
+      { id: 3, name: 'Rahul Singh', emoji: '🪚', category: 'carpenter', location: 'Vaishali, Ghaziabad', price: 349, exp: 7, rating: 4.7, jobs: 285, skills: ['Hinges','Repairs','Assembly'], phone:'tel:+919222334455' },
+      { id: 4, name: 'Neha Sharma', emoji: '❄️', category: 'appliance', location: 'Raj Nagar, Ghaziabad', price: 499, exp: 6, rating: 4.9, jobs: 510, skills: ['AC service','Fridge','Washer'], phone:'tel:+919667788990' },
+      { id: 5, name: 'Imran Khan', emoji: '🎨', category: 'painter', location: 'Noida Sector 15', price: 399, exp: 8, rating: 4.5, jobs: 260, skills: ['Interior','Exterior','Putty'], phone:'tel:+919700112233' },
+      { id: 6, name: 'Sunita Devi', emoji: '🧹', category: 'cleaning', location: 'Kaushambi, Ghaziabad', price: 299, exp: 3, rating: 4.4, jobs: 180, skills: ['Deep clean','Kitchen','Bathroom'], phone:'tel:+919844556677' },
+      { id: 7, name: 'Ankit Patel', emoji: '🧑‍🏫', category: 'tutor', location: 'Indirapuram, Ghaziabad', price: 499, exp: 4, rating: 4.8, jobs: 95, skills: ['Math','Science','CS'], phone:'tel:+919911223344' },
+      { id: 8, name: 'Ritu Mehra', emoji: '🛠️', category: 'it', location: 'Noida Sector 63', price: 299, exp: 5, rating: 4.6, jobs: 145, skills: ['OS setup','Data','Networking'], phone:'tel:+919800112244' },
+      { id: 9, name: 'Vikram Rao', emoji: '🚚', category: 'cleaning', location: 'Kavi Nagar, Ghaziabad', price: 349, exp: 5, rating: 4.3, jobs: 210, skills: ['Sofa','Carpet','Office'], phone:'tel:+919877665544' },
+      { id:10, name: 'Kavya Iyer', emoji: '🪠', category: 'plumber', location: 'Noida Sector 18', price: 279, exp: 6, rating: 4.7, jobs: 330, skills: ['Clog','Mixer','Shower'], phone:'tel:+919855443322' },
+      { id:11, name: 'Sanjay Gupta', emoji: '🔌', category: 'electrician', location: 'Ghaziabad RDC', price: 319, exp: 9, rating: 4.9, jobs: 610, skills: ['Earthing','DB','Inverter'], phone:'tel:+919811111111' },
+      { id:12, name: 'Pooja Das', emoji: '🧯', category: 'appliance', location: 'Crossing Republik', price: 459, exp: 4, rating: 4.5, jobs: 205, skills: ['Microwave','Chimney','AC'], phone:'tel:+919833221100' },
+      
+      // New providers for expanded services
+      { id:13, name: 'Maya Agrawal', emoji: '🤗', category: 'caregiver', location: 'Vasundhara, Ghaziabad', price: 799, exp: 6, rating: 4.8, jobs: 145, skills: ['Elder care','Child care','Medical aid'], phone:'tel:+919888123456' },
+      { id:14, name: 'Rajesh Gupta', emoji: '👨‍🍳', category: 'chef', location: 'Noida Sector 37', price: 899, exp: 8, rating: 4.7, jobs: 180, skills: ['North Indian','South Indian','Chinese'], phone:'tel:+919777234567' },
+      { id:15, name: 'Suresh Kumar', emoji: '🛡️', category: 'security', location: 'Indirapuram, Ghaziabad', price: 12000, exp: 10, rating: 4.6, jobs: 85, skills: ['Night watch','CCTV','Patrol'], phone:'tel:+919666345678' },
+      { id:16, name: 'Mohan Lal', emoji: '🚗', category: 'driver', location: 'Raj Nagar, Ghaziabad', price: 15000, exp: 12, rating: 4.9, jobs: 120, skills: ['Personal driver','Long distance','Safe driving'], phone:'tel:+919555456789' },
+      { id:17, name: 'Deepika Kaur', emoji: '🌱', category: 'gardener', location: 'Noida Sector 21', price: 349, exp: 5, rating: 4.5, jobs: 95, skills: ['Landscaping','Plant care','Watering'], phone:'tel:+919444567890' },
+      { id:18, name: 'Vinod Sharma', emoji: '🐜', category: 'pest', location: 'Kaushambi, Ghaziabad', price: 599, exp: 7, rating: 4.7, jobs: 340, skills: ['Cockroach','Termite','Rats'], phone:'tel:+919333678901' },
+      { id:19, name: 'Kavita Joshi', emoji: '💆', category: 'massage', location: 'Vaishali, Ghaziabad', price: 1299, exp: 4, rating: 4.6, jobs: 78, skills: ['Deep tissue','Relaxation','Therapy'], phone:'tel:+919222789012' },
+      { id:20, name: 'Meera Singh', emoji: '💅', category: 'beauty', location: 'Noida Sector 52', price: 799, exp: 3, rating: 4.4, jobs: 125, skills: ['Facial','Manicure','Hair'], phone:'tel:+919111890123' },
+      
+      // Additional providers for existing services
+      { id:21, name: 'Ravi Tiwari', emoji: '🔧', category: 'electrician', location: 'Noida Sector 10', price: 259, exp: 3, rating: 4.3, jobs: 155, skills: ['Basic wiring','Switch','Socket'], phone:'tel:+919000901234' },
+      { id:22, name: 'Shanti Devi', emoji: '🏠', category: 'cleaning', location: 'Loni, Ghaziabad', price: 199, exp: 2, rating: 4.2, jobs: 90, skills: ['House cleaning','Mopping','Dusting'], phone:'tel:+918999012345' },
+      { id:23, name: 'Abhishek Roy', emoji: '👨‍🏫', category: 'tutor', location: 'Noida Sector 76', price: 599, exp: 7, rating: 4.9, jobs: 145, skills: ['Physics','Chemistry','English'], phone:'tel:+918888123456' },
+      { id:24, name: 'Geeta Kumari', emoji: '🍳', category: 'chef', location: 'Vasundhara, Ghaziabad', price: 699, exp: 5, rating: 4.5, jobs: 85, skills: ['Gujarati','Punjabi','Continental'], phone:'tel:+918777234567' },
+      { id:25, name: 'Ashok Yadav', emoji: '🚿', category: 'plumber', location: 'Noida Sector 41', price: 289, exp: 8, rating: 4.8, jobs: 275, skills: ['Bathroom','Toilet','Water heater'], phone:'tel:+918666345678' },
+      { id:26, name: 'Seema Rani', emoji: '👶', category: 'caregiver', location: 'Kavi Nagar, Ghaziabad', price: 699, exp: 4, rating: 4.7, jobs: 65, skills: ['Baby care','Feeding','Playing'], phone:'tel:+918555456789' },
+      { id:27, name: 'Ramesh Chand', emoji: '🪴', category: 'gardener', location: 'Indirapuram, Ghaziabad', price: 299, exp: 6, rating: 4.4, jobs: 110, skills: ['Lawn care','Pruning','Fertilizer'], phone:'tel:+918444567890' },
+      { id:28, name: 'Nisha Gupta', emoji: '💇', category: 'beauty', location: 'Raj Nagar, Ghaziabad', price: 899, exp: 5, rating: 4.8, jobs: 98, skills: ['Bridal makeup','Party makeup','Spa'], phone:'tel:+918333678901' },
+      { id:29, name: 'Dinesh Kumar', emoji: '🛠️', category: 'carpenter', location: 'Noida Sector 29', price: 379, exp: 9, rating: 4.6, jobs: 195, skills: ['Modular kitchen','Wardrobe','Doors'], phone:'tel:+918222789012' },
+      { id:30, name: 'Lalita Sharma', emoji: '🧴', category: 'cleaning', location: 'Crossing Republik', price: 399, exp: 4, rating: 4.5, jobs: 135, skills: ['Glass cleaning','Upholstery','Sanitization'], phone:'tel:+918111890123' },
+      { id:31, name: 'Manoj Singh', emoji: '⚡', category: 'it', location: 'Vaishali, Ghaziabad', price: 399, exp: 6, rating: 4.7, jobs: 88, skills: ['Laptop repair','Software','Hardware'], phone:'tel:+918000901234' },
+      { id:32, name: 'Asha Devi', emoji: '🏥', category: 'caregiver', location: 'Noida Sector 45', price: 899, exp: 8, rating: 4.9, jobs: 72, skills: ['Post-surgery','Medication','Physiotherapy'], phone:'tel:+917999012345' }
+    ];
+
+    // ========= Utilities =========
+    const $ = (q, root=document) => root.querySelector(q);
+    const $$ = (q, root=document) => Array.from(root.querySelectorAll(q));
+    const debounce = (fn, ms=250) => { let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), ms); }; };
+    const fmtINR = n => n > 999 ? `₹${(n/1000).toFixed(0)}k/month` : `₹${n}`;
+    const toastRoot = document.getElementById('toastRoot');
+
+    function showToast(msg, type='success') {
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.innerHTML = `<div class="toast-icon">${type==='success'?'✅':'ℹ️'}</div><div>${msg}</div>`;
+      toastRoot.appendChild(el);
+      setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(20px)'; }, 2800);
+      setTimeout(()=> el.remove(), 3400);
+    }
+
+    // ========= Theme =========
+    const themeBtns = $$('.theme-btn');
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      themeBtns.forEach(b => b.classList.toggle('active', b.dataset.theme===theme));
+      localStorage.setItem('hc_theme', theme);
+    }
+    themeBtns.forEach(b => b.addEventListener('click', ()=> setTheme(b.dataset.theme)));
+    setTheme(localStorage.getItem('hc_theme') || 'light');
+
+    // ========= Mobile Nav =========
+    const mobileToggle = $('#mobileToggle');
+    const navLinks = $('#navLinks');
+    mobileToggle.addEventListener('click', () => {
+      const open = navLinks.classList.toggle('open');
+      mobileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    navLinks.addEventListener('click', (e)=>{
+      if(e.target.matches('a')) navLinks.classList.remove('open');
+    });
+
+    // ========= Routing =========
+    const pages = $$('.page');
+    const routeMap = {
+      home: '#page-home',
+      services: '#page-services',
+      providers: '#page-providers',
+      help: '#page-help',
+      register: '#page-register',
+      about: '#page-about'
+    };
+    function setActiveNav(route) {
+      $$('#navLinks a').forEach(a => a.setAttribute('aria-current', a.dataset.route===route ? 'page' : 'false'));
+    }
+    function navigate(hash) {
+      const route = hash.replace('#','') || 'home';
+      pages.forEach(p => p.classList.remove('active'));
+      const sel = routeMap[route] || routeMap.home;
+      $(sel)?.classList.add('active');
+      setActiveNav(route);
+      document.getElementById('main').focus({preventScroll:true});
+    }
+    window.addEventListener('hashchange', ()=> navigate(location.hash));
+    navigate(location.hash);
+
+    // ========= Render: Services =========
+    function renderServicePills() {
+      const wrap = $('#servicePills');
+      wrap.innerHTML = '';
+      const all = document.createElement('button');
+      all.className='pill active';
+      all.textContent='All';
+      all.dataset.id='';
+      wrap.appendChild(all);
+      categories.forEach(c=>{
+        const b=document.createElement('button');
+        b.className='pill';
+        b.textContent=`${c.icon} ${c.name}`;
+        b.dataset.id=c.id;
+        wrap.appendChild(b);
+      });
+      wrap.addEventListener('click',(e)=>{
+        if(!e.target.classList.contains('pill')) return;
+        $$('#servicePills .pill').forEach(x=>x.classList.remove('active'));
+        e.target.classList.add('active');
+        const id = e.target.dataset.id;
+        renderServicesGrid(id);
+      });
+    }
+
+    function renderHomeCategories() {
+      const home = $('#homeCategories');
+      home.innerHTML = '';
+      categories.slice(0,8).forEach(c=>{
+        const card = document.createElement('div');
+        card.className='card service-card';
+        card.tabIndex=0;
+        card.innerHTML = `
+          <div class="service-icon">${c.icon}</div>
+          <h3>${c.name}</h3>
+          <p>${c.desc}</p>
+          <div class="actions" style="justify-content:center;margin-top:.6rem;">
+            <a class="button secondary" href="#providers" data-route="providers" data-cat="${c.id}">View Providers</a>
+            <a class="button" href="#help" data-route="help">Book</a>
+          </div>`;
+        card.addEventListener('click', (e)=>{
+          if(e.target.matches('a')) return;
+          location.hash = '#providers';
+          setTimeout(()=> { $('#provCategory').value = c.id; applyProvFilters(); }, 0);
+        });
+        home.appendChild(card);
+      });
+    }
+
+    function renderServicesGrid(filterId='') {
+      const grid = $('#servicesGrid');
+      grid.innerHTML = '';
+      const list = filterId ? categories.filter(c=>c.id===filterId) : categories;
+      list.forEach(c=>{
+        const card = document.createElement('div');
+        card.className='card service-card';
+        card.innerHTML = `
+          <div class="service-icon">${c.icon}</div>
+          <h3>${c.name}</h3>
+          <p>${c.desc}</p>
+          <div class="actions" style="justify-content:center;margin-top:.6rem;">
+            <a class="button secondary" href="#providers" data-route="providers" data-cat="${c.id}">View Providers</a>
+            <a class="button" href="#help" data-route="help">Book</a>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    // ========= Render: Providers =========
+    function initProviderFilters() {
+      const selCat = $('#provCategory');
+      const selLoc = $('#provLocation');
+      selCat.innerHTML = '<option value="">All Categories</option>' + categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+      const uniqueLoc = [...new Set(providers.map(p=>p.location))].sort();
+      selLoc.innerHTML = '<option value="">All Locations</option>' + uniqueLoc.map(l=>`<option>${l}</option>`).join('');
+    }
+
+    function starRow(rating) {
+      const full = Math.floor(rating);
+      const half = rating - full >= 0.5;
+      let stars = '★★★★★'.slice(0, full);
+      if(half && stars.length<5) stars += '⭐';
+      return stars.padEnd(5,'☆');
+    }
+
+    function providerCard(p) {
+      const el = document.createElement('div');
+      el.className='card provider-card';
+      el.innerHTML = `
+        <div class="provider-header">
+          <div class="avatar" aria-hidden="true">${p.emoji}</div>
+          <div style="font-weight:800;font-size:1.1rem;">${p.name}</div>
+          <div class="chip">${categories.find(c=>c.id===p.category)?.name || ''}</div>
+        </div>
+        <div class="provider-body">
+          <div class="provider-skills">${p.skills.map(s=>`<span class="skill-tag">${s}</span>`).join('')}</div>
+          <div class="provider-info">
+            <div>📍 ${p.location}</div>
+            <div>⭐ ${p.rating} • ${starRow(p.rating)} • ${p.jobs} jobs</div>
+            <div>💼 ${p.exp} yrs exp • 💸 ${fmtINR(p.price)} ${p.price > 999 ? '' : 'visit'}</div>
+          </div>
+          <div class="provider-actions">
+            <button class="button" data-action="book" data-id="${p.id}">📅 Book</button>
+            <a class="button secondary" href="${p.phone}" data-action="call">📞 Call</a>
+            <button class="button secondary" data-action="details" data-id="${p.id}">ℹ️ Details</button>
+          </div>
+        </div>`;
+      return el;
+    }
+
+    function renderProviders(list=providers) {
+      const grid = $('#providersGrid');
+      grid.innerHTML = '';
+      if(!list.length) {
+        grid.innerHTML = `<div class="card" style="padding:1rem;">No providers found. Try adjusting filters.</div>`;
+        return;
+      }
+      list.forEach(p=> grid.appendChild(providerCard(p)));
+    }
+
+    function applyProvFilters() {
+      const q = $('#provSearch').value.trim().toLowerCase();
+      const cat = $('#provCategory').value;
+      const loc = $('#provLocation').value;
+      const sort = $('#provSort').value;
+
+      let list = providers.filter(p=>{
+        const matchQ = !q || p.name.toLowerCase().includes(q) || p.skills.join(' ').toLowerCase().includes(q) || (categories.find(c=>c.id===p.category)?.name.toLowerCase().includes(q));
+        const matchC = !cat || p.category===cat;
+        const matchL = !loc || p.location===loc;
+        return matchQ && matchC && matchL;
+      });
+
+      const sorters = {
+        'rating_desc': (a,b)=> b.rating - a.rating,
+        'price_asc': (a,b)=> a.price - b.price,
+        'price_desc': (a,b)=> b.price - a.price,
+        'exp_desc': (a,b)=> b.exp - a.exp,
+      };
+      list.sort(sorters[sort] || sorters.rating_desc);
+      renderProviders(list);
+    }
+
+    // ========= Booking Modal =========
+    const bookingModal = $('#bookingModal');
+    const bookingForm = $('#bookingForm');
+    function openBooking(p) {
+      $('#bookingProviderId').value = p.id;
+      $('#bookingProvider').value = p.name;
+      $('#bookingService').value = categories.find(c=>c.id===p.category)?.name || '';
+      bookingModal.classList.add('active');
+      bookingModal.setAttribute('aria-hidden','false');
+      $('#bookingName').focus();
+    }
+    function closeBooking() {
+      bookingModal.classList.remove('active');
+      bookingModal.setAttribute('aria-hidden','true');
+      bookingForm.reset();
+    }
+    $('#bookingClose').addEventListener('click', closeBooking);
+    $('#bookingCancel').addEventListener('click', closeBooking);
+    bookingModal.addEventListener('click',(e)=>{ if(e.target===bookingModal) closeBooking(); });
+
+    // ========= Forms: Help / Booking / Register =========
+    function setMinDateInputs() {
+      const t = new Date();
+      const yyyy = t.getFullYear();
+      const mm = String(t.getMonth()+1).padStart(2,'0');
+      const dd = String(t.getDate()).padStart(2,'0');
+      const today = `${yyyy}-${mm}-${dd}`;
+      $('#helpDate').setAttribute('min', today);
+      $('#bookingDate').setAttribute('min', today);
+    }
+    setMinDateInputs();
+
+    function formToObject(form) {
+      const fd = new FormData(form);
+      const obj = {};
+      for (const [k,v] of fd.entries()) obj[k]=v;
+      return obj;
+    }
+    function saveLocal(key, item) {
+      const arr = JSON.parse(localStorage.getItem(key) || '[]');
+      arr.push({...item, _ts: Date.now()});
+      localStorage.setItem(key, JSON.stringify(arr));
+    }
+
+    $('#helpForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const form = e.currentTarget;
+      if(!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const data = formToObject(form);
+      saveLocal('hc_requests', data);
+      showToast('We will connect you soon', 'success');
+      form.reset();
+    });
+
+    bookingForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const form = e.currentTarget;
+      if(!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const data = {
+        providerId: $('#bookingProviderId').value,
+        providerName: $('#bookingProvider').value,
+        service: $('#bookingService').value,
+        name: $('#bookingName').value,
+        phone: $('#bookingPhone').value,
+        date: $('#bookingDate').value,
+        time: $('#bookingTime').value,
+        address: $('#bookingAddress').value
+      };
+      saveLocal('hc_bookings', data);
+      closeBooking();
+      showToast('We will connect you soon', 'success');
+    });
+
+    $('#registerForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const form = e.currentTarget;
+      // Manual IFSC uppercase
+      const ifscEl = $('#regIFSC'); ifscEl.value = ifscEl.value.toUpperCase();
+      if(!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      const data = formToObject(form);
+      // Do not store files in localStorage; only metadata
+      data.hasAadhaar = $('#regAadhaar').files?.length ? true : false;
+      saveLocal('hc_applications', data);
+      showToast('Application submitted! We will connect you soon', 'success');
+      form.reset();
+    });
+
+    // ========= Init UI =========
+    // Home
+    renderHomeCategories();
+    // Services
+    renderServicePills();
+    renderServicesGrid();
+    $('#toRegisterFromServices').addEventListener('click', ()=> location.hash='#register');
+    // Providers
+    initProviderFilters();
+    renderProviders();
+    $('#provSearch').addEventListener('input', debounce(applyProvFilters, 200));
+    $('#provCategory').addEventListener('change', applyProvFilters);
+    $('#provLocation').addEventListener('change', applyProvFilters);
+    $('#provSort').addEventListener('change', applyProvFilters);
+    $('#resetProv').addEventListener('click', ()=>{
+      $('#provSearch').value='';
+      $('#provCategory').value='';
+      $('#provLocation').value='';
+      $('#provSort').value='rating_desc';
+      renderProviders();
+    });
+    $('#quickBook').addEventListener('click', ()=>{
+      const topRated = [...providers].sort((a,b)=> b.rating-a.rating)[0];
+      openBooking(topRated);
+    });
+
+    // Populate Help and Register select options
+    function fillSelectOptions() {
+      const s = $('#helpService');
+      s.innerHTML = '<option value="" disabled selected>Select a service</option>' + categories.map(c=>`<option value="${c.name}">${c.name}</option>`).join('');
+      const rc = $('#regCategory');
+      rc.innerHTML = '<option value="" disabled selected>Select a primary service</option>' + categories.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+    }
+    fillSelectOptions();
+
+    // Delegate provider card actions
+    $('#providersGrid').addEventListener('click', (e)=>{
+      const btn = e.target.closest('button, a');
+      if(!btn) return;
+      const action = btn.dataset.action;
+      if(action==='book') {
+        const id = Number(btn.dataset.id);
+        const p = providers.find(x=>x.id===id);
+        if(p) openBooking(p);
+      }
+      if(action==='details') {
+        const id = Number(btn.dataset.id);
+        const p = providers.find(x=>x.id===id);
+        if(!p) return;
+        const catName = categories.find(c=>c.id===p.category)?.name || '';
+        const pricing = p.price > 999 ? `${fmtINR(p.price)}/month` : `${fmtINR(p.price)}/visit`;
+        alert(`${p.name} • ${catName}
+Location: ${p.location}
+Experience: ${p.exp} years
+Rating: ${p.rating} (${p.jobs} jobs)
+Pricing: ${pricing}
+Skills: ${p.skills.join(', ')}`);
+      }
+    });
+
+    // Deep link: if navigated from service card
+    document.addEventListener('click', (e)=>{
+      if(e.target.matches('[data-route="providers"][data-cat]')) {
+        const id = e.target.getAttribute('data-cat');
+        setTimeout(()=> { $('#provCategory').value = id; applyProvFilters(); }, 0);
+      }
+    });
+
+    // Stats dynamic counts
+    $('#stat-providers').textContent = String(providers.length);
+    $('#stat-categories').textContent = String(categories.length);
+  </script>
+</body>
+</html>
